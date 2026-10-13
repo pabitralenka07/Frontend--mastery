@@ -1,8 +1,8 @@
 /* Poly Heart model by Quaternius [CC0] (https://creativecommons.org/publicdomain/zero/1.0/) via Poly Pizza (https://poly.pizza/m/1yCRUwFnwX)
 */
-import * as THREE from "https://cdn.skypack.dev/three@0.135.0";
-import { gsap } from "https://cdn.skypack.dev/gsap@3.8.0";
-import { GLTFLoader } from "https://cdn.skypack.dev/three@0.135.0/examples/jsm/loaders/GLTFLoader";
+import * as THREE from "https://esm.sh/three@0.135.0";
+import { gsap } from "https://esm.sh/gsap@3.8.0";
+import { GLTFLoader } from "https://esm.sh/three@0.135.0/examples/jsm/loaders/GLTFLoader";
 class World {
 constructor({
     canvas,

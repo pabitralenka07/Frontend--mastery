@@ -1,26 +1,20 @@
 {
   "version": 2,
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/ecommerce", "destination": "/Pabitra-ecommerce/index.html" },
-    { "source": "/holo-card", "destination": "/holo_card.html" },
-    { "source": "/spark-login", "destination": "/spark_login.html" },
-    { "source": "/lamp", "destination": "/pull_lamp.html" },
-    { "source": "/neon-password", "destination": "/neon_password.html" },
-    { "source": "/otp", "destination": "/otp_island.html" },
-    { "source": "/clock", "destination": "/clock.html" },
-    { "source": "/portfolio", "destination": "/Portfolio/index.html" },
-    { "source": "/todo", "destination": "/ToDo_List/index.html" },
-    { "source": "/heart-3d", "destination": "/Heart_song/index.html" },
-    { "source": "/thunder", "destination": "/Thunder/thunder.html" },
-    { "source": "/particles", "destination": "/animation/abc1.html" },
-    { "source": "/heartbeat", "destination": "/Heartbeat/heartbeat.html" },
-    { "source": "/floating-hearts", "destination": "/Floatheart/floatheart.html" },
-    { "source": "/login-slider", "destination": "/LoginForm/loginform.html" },
-    { "source": "/babu-portfolio", "destination": "/Mypage2/mypage2.html" },
-    { "source": "/designer-portfolio", "destination": "/PL/pl.html" },
-    { "source": "/aos-portfolio", "destination": "/myPage3/mypage3.html" },
-    { "source": "/polaroid-wall", "destination": "/wpPic/wppic.html" },
-    { "source": "/tentacles", "destination": "/-TENTACLE-SYNC-CURSOR-main/index.html" }
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
   ]
 }

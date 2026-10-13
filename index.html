@@ -589,12 +589,38 @@
       overflow: hidden;
       position: relative;
     }
+    .modal-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      z-index: 10;
+      background: #0A0D15;
+      transition: opacity 0.25s ease;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.08);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     .preview-iframe {
       width: 100%;
       height: 100%;
       border: 0;
       background: #07090F;
-      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     }
     .preview-iframe.tablet {
       width: 768px;
@@ -762,14 +788,18 @@
         </div>
 
         <div class="modal-controls">
+          <a href="#" target="_blank" class="nav-btn primary" id="openExternalFullBtn" style="padding: 7px 14px; font-size: 12.5px; text-decoration: none;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Fullscreen</a>
           <button class="modal-ctrl-btn" id="reloadFrameBtn" title="Reload Frame"><i class="fa-solid fa-arrow-rotate-right"></i></button>
-          <a href="#" target="_blank" class="modal-ctrl-btn" id="openExternalBtn" title="Open Fullscreen in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           <button class="modal-ctrl-btn modal-close" id="closeModalBtn" title="Close"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>
 
       <div class="modal-iframe-container">
-        <iframe id="previewIframe" class="preview-iframe" src="" allowfullscreen></iframe>
+        <div class="modal-loader" id="modalLoader">
+          <div class="spinner"></div>
+          <span>Loading interactive demo...</span>
+        </div>
+        <iframe id="previewIframe" class="preview-iframe" src="" allowfullscreen allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
       </div>
     </div>
   </div>
@@ -1100,21 +1130,43 @@
       renderProjects();
     });
 
+    const modalLoader = document.getElementById("modalLoader");
+    const openExternalFullBtn = document.getElementById("openExternalFullBtn");
+    let loadTimer = null;
+
     // Open Modal Preview
     window.openPreview = function(url, title) {
       activePreviewUrl = url;
-      previewIframe.src = url;
+      modalLoader.style.display = "flex";
+      previewIframe.style.opacity = "0";
       modalTitle.textContent = title;
       modalUrl.textContent = "/" + url;
-      openExternalBtn.href = url;
+      openExternalFullBtn.href = url;
       modal.classList.add("open");
       document.body.style.overflow = "hidden";
+
+      // Load iframe
+      previewIframe.src = url;
+
+      clearTimeout(loadTimer);
+      loadTimer = setTimeout(() => {
+        modalLoader.style.display = "none";
+        previewIframe.style.opacity = "1";
+      }, 1400);
     };
+
+    previewIframe.addEventListener("load", () => {
+      clearTimeout(loadTimer);
+      modalLoader.style.display = "none";
+      previewIframe.style.opacity = "1";
+    });
 
     // Close Modal Preview
     function closeModal() {
+      clearTimeout(loadTimer);
       modal.classList.remove("open");
       previewIframe.src = "";
+      previewIframe.style.opacity = "0";
       document.body.style.overflow = "";
     }
     closeModalBtn.addEventListener("click", closeModal);
