@@ -332,7 +332,7 @@ npx serve .
 [![GitHub](https://img.shields.io/badge/GitHub-pabitralenka07-181717?style=for-the-badge&logo=github)](https://github.com/pabitralenka07)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Pabitra%20Lenka-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/pabitra-lenka-777423324/)
 [![X / Twitter](https://img.shields.io/badge/X-@PabitraLenka777-000000?style=for-the-badge&logo=x)](https://x.com/PabitraLenka777)
-[![Instagram](https://img.shields.io/badge/Instagram-@__duh.__.its__babu__-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/_duh._.its_babu_?igsh=MXZyODBoenlvOHZ1dQ==)
+[![Instagram](https://img.shields.io/badge/Instagram-@__lenka__babu._-E4405F?style=for-the-badge&logo=instagram)](https://www.instagram.com/__lenka_babu._?igsh=MXZyODBoenlvOHZ1dQ==)
 
 ---
 
