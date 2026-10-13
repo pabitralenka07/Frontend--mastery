@@ -1,0 +1,43 @@
+/* background.css - Styles for the interactive background */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;   /* ensure true viewport size */
+  height: 100vh;
+  z-index: -1;    /* behind all content */
+  pointer-events: none; /* let clicks pass through */
+  display: block; /* Prevents tiny default margins */
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #000;
+  color: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* --- Just for demo purposes --- */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}

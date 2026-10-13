@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holo Card Checkout</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #06070C; color: #EEF1F7; font-family: system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .checkout { box-sizing: border-box; width: min(380px, 92vw); display: grid; gap: 14px; min-width: 0; }
+
+  /* the flip, same lines as in the video */
+  .card { perspective: 1000px; aspect-ratio: 1.586; min-width: 0; -webkit-box-reflect: below 6px linear-gradient(transparent 78%, rgba(0,0,0,.14)); margin-bottom: 40px; }
+  .inner { position: relative; height: 100%; transform-style: preserve-3d;
+    transition: transform .7s
+    cubic-bezier(.3, 1.4, .5, 1); }
+  .flipped .inner { transform: rotateY(180deg); }
+
+  .tilt { height: 100%; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; transition: transform .4s cubic-bezier(.23, 1, .32, 1); }
+  .face { position: absolute; inset: 0; border-radius: 18px; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    /* brushed metal, then a holographic band on top */
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+      linear-gradient(135deg, #1B2032, #2A2F48 55%, #1B2032);
+    box-shadow: 0 24px 50px -20px rgba(0,0,0,.8), inset 0 0 0 1px rgba(255,255,255,.18); }
+  .back { transform: rotateY(180deg); }
+  /* holographic sheen: a rainbow band that follows the pointer */
+  .face::after { content: ""; position: absolute; inset: -40%; pointer-events: none; mix-blend-mode: overlay; opacity: .62;
+    background: linear-gradient(115deg, #FF6FB5 20%, #FFD36B 35%, #7CF2D2 50%, #6FA8FF 65%, #C28BFF 80%);
+    transform: translate(var(--sx, 0%), var(--sy, 0%)); transition: transform .4s cubic-bezier(.23, 1, .32, 1); }
+
+  .chip { position: absolute; left: 22px; top: 50px; width: 42px; height: 32px; border-radius: 7px; background: linear-gradient(135deg, #F6D98A, #C99A3E); box-shadow: inset 0 0 0 1px rgba(0,0,0,.2); }
+  .brand { position: absolute; right: 22px; top: 18px; font: italic 900 22px system-ui, sans-serif; letter-spacing: -.02em; }
+  .brand .mc { display: none; width: 46px; height: 28px; }
+  [data-brand="mc"] .brand .visa { display: none; }
+  [data-brand="mc"] .brand .mc { display: block; }
+  .num { position: absolute; left: 22px; right: 22px; top: 100px; font: 600 clamp(15px, 4.7vw, 20px) Menlo, monospace; color: #F2F5FF;
+    text-shadow: -.6px -.7px 0 rgba(255,255,255,.35), .9px 1.2px 0 rgba(0,0,0,.55); letter-spacing: .08em; word-spacing: .3em; white-space: nowrap; }
+  .meta { position: absolute; left: 22px; right: 22px; bottom: 18px; display: flex; justify-content: space-between; font-size: 13px; }
+  .meta small { display: block; margin-bottom: 2px; color: rgba(238,241,247,.55); font-size: 9px; letter-spacing: .08em; }
+  .stripe { position: absolute; left: 0; right: 0; top: 26px; height: 42px; background: #0A0B10; }
+  .sign { position: absolute; left: 22px; right: 22px; top: 88px; height: 36px; border-radius: 6px; background: repeating-linear-gradient(-45deg, #E9ECF3 0 6px, #D5DAE6 6px 12px);
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; color: #111; font: 700 15px Menlo, monospace; }
+
+  .field { display: grid; gap: 6px; min-width: 0; font-size: 12px; color: #8A92A6; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+  .field input { min-width: 0; box-sizing: border-box; width: 100%; height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #11141D; color: #EEF1F7; font: 500 15px system-ui, sans-serif;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); transition: box-shadow .15s ease; }
+  .field input:focus { outline: 0; box-shadow: inset 0 0 0 1.5px #9FB8FF; }
+
+  .pay { position: relative; height: 50px; border: 0; border-radius: 14px; cursor: pointer; overflow: hidden; color: #fff; font: 650 16px system-ui, sans-serif;
+    background: linear-gradient(90deg, #5B7CFF, #9A6BFF); transition: transform .12s cubic-bezier(.23, 1, .32, 1), background .35s ease; }
+  .pay:active { transform: scale(.97); }
+  .pay:focus-visible { outline: 2px solid #9FB8FF; outline-offset: 3px; }
+  .pay.done { background: #22C67A; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inner { transition: transform .2s ease; }
+    .tilt, .face::after { transition: none; }
+  }
+</style>
+</head>
+<body>
+<form class="checkout" autocomplete="off">
+  <div class="card" data-brand="visa">
+    <div class="tilt">
+      <div class="inner">
+        <div class="face front">
+          <div class="brand"><span class="visa">VISA</span>
+            <svg class="mc" viewBox="0 0 46 28"><circle cx="16" cy="14" r="13" fill="#EB001B"/><circle cx="30" cy="14" r="13" fill="#F79E1B" fill-opacity=".9"/></svg></div>
+          <div class="chip"></div>
+          <div class="num">•••• •••• •••• ••••</div>
+          <div class="meta"><div><small>Card holder</small><span class="holder">YOUR NAME</span></div><div><small>Expires</small><span class="exp">MM/YY</span></div></div>
+        </div>
+        <div class="face back"><div class="stripe"></div><div class="sign"><span class="cvv-out">•••</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <label class="field">Card number<input id="number" inputmode="numeric" placeholder="4242 4242 4242 4242" maxlength="19"></label>
+  <label class="field">Name on card<input id="holder" placeholder="Your name"></label>
+  <div class="row">
+    <label class="field">Expires<input id="exp" inputmode="numeric" placeholder="09/29" maxlength="5"></label>
+    <label class="field">CVV<input id="cvv" inputmode="numeric" placeholder="123" maxlength="4"></label>
+  </div>
+  <button class="pay">Pay $49.00</button>
+</form>
+
+<script>
+  const form = document.querySelector('.checkout');
+  const card = form.querySelector('.card');
+  const tilt = card.querySelector('.tilt');
+  const [number, holder, exp, cvv] = ['number', 'holder', 'exp', 'cvv'].map(id => document.getElementById(id));
+  const out = sel => card.querySelector(sel);
+
+  // the flip and brand detection, same lines as in the video
+  cvv.onfocus = () =>
+    card.classList.add('flipped');
+  cvv.onblur = () =>
+    card.classList.remove('flipped');
+
+  number.oninput = () => card.dataset.brand =
+    /^4/.test(number.value) ? 'visa' : 'mc';
+
+  // live preview with simple formatting
+  number.addEventListener('input', () => {
+    const digits = number.value.replace(/\D/g, '').slice(0, 16);
+    number.value = digits.replace(/(.{4})(?=.)/g, '$1 ');
+    out('.num').textContent = digits.padEnd(16, '•').replace(/(.{4})(?=.)/g, '$1 ');
+  });
+  holder.oninput = () => out('.holder').textContent = holder.value.toUpperCase() || 'YOUR NAME';
+  exp.oninput = () => {
+    const d = exp.value.replace(/\D/g, '').slice(0, 4);
+    exp.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+    out('.exp').textContent = exp.value || 'MM/YY';
+  };
+  cvv.oninput = () => { cvv.value = cvv.value.replace(/\D/g, ''); out('.cvv-out').textContent = cvv.value || '•••'; };
+
+  // tilt and holographic shine follow the pointer
+  if (matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+    card.addEventListener('pointermove', e => {
+      const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      tilt.style.setProperty('--ry', `${x * 14}deg`); tilt.style.setProperty('--rx', `${-y * 10}deg`);
+      card.style.setProperty('--sx', `${x * 40}%`); card.style.setProperty('--sy', `${y * 30}%`);
+    });
+    card.addEventListener('pointerleave', () => ['--rx', '--ry'].forEach(p => tilt.style.removeProperty(p)));
+  }
+
+  function pay() { return new Promise(done => setTimeout(done, 900)); }   // your payment provider goes here
+
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const btn = form.querySelector('.pay');
+    if (btn.classList.contains('done')) return;
+    btn.textContent = 'Processing…';
+    await pay();
+    btn.classList.add('done'); btn.textContent = 'Payment complete ✓';
+  };
+</script>
+</body>
+</html>

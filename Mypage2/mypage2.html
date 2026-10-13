@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pabitra Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+    <link rel="stylesheet" href="mypage2.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo"><span>BABU</span></div>
+            <div class="links">
+                <div class="link"><a href="#">Home</a></div>
+                <div class="link"><a href="#">About</a></div>
+                <div class="link"><a href="#">Skills</a></div>
+                <div class="link"><a href="#">Services</a></div>
+                <div class="link"><a href="#">Blogs</a></div>
+                <div class="link contact-btn"><a href="#">Contact Us</a></div>
+            </div>
+            <i class="fa-solid fa-bars hamburg" onclick="openMenu()"></i>
+        </div>
+        <div class="dropdown">
+            <div class="links">
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Skills</a>
+                <a href="#">Services</a>
+                <a href="#">Blogs</a>
+                <a href="#">Contact Us</a>
+                <i class="fa-solid fa-xmark cancel" onclick="closeMenu()"></i>
+            </div>
+        </div>
+    </nav>
+
+    <section>
+        <div class="main-container">
+            <div class="image">
+                <!-- Put pic.png in the same folder as this file -->
+                <img src="/pic.png" alt="Pabitra Lenka">
+            </div>
+            <div class="content">
+                <h1>Hey I'm <span>Pabitra Lenka</span></h1>
+                <div class="typewriter">
+                    <span>I'm a <span id="typed-role"></span></span>
+                    <span class="cursor"></span>
+                </div>
+                <p>I build clean, responsive web experiences and enjoy turning ideas into interfaces people actually like using.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-github"></i></a>
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+                <div class="btn">
+                    <button>Download CV</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; <span id="year"></span> Pabitra Lenka. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function openMenu(){
+            document.querySelector(".dropdown").style.transform = "translateY(0px)";
+        }
+        function closeMenu(){
+            document.querySelector(".dropdown").style.transform = "translateY(-500px)";
+        }
+
+        // Real typewriter effect (types + deletes each word in turn)
+        const words = ["Developer", "Designer", "Youtuber"];
+        const el = document.getElementById("typed-role");
+        let wordIndex = 0, charIndex = 0, deleting = false;
+
+        function tick(){
+            const current = words[wordIndex];
+            if(!deleting){
+                charIndex++;
+                el.textContent = current.slice(0, charIndex);
+                if(charIndex === current.length){
+                    deleting = true;
+                    setTimeout(tick, 1200);
+                    return;
+                }
+            } else {
+                charIndex--;
+                el.textContent = current.slice(0, charIndex);
+                if(charIndex === 0){
+                    deleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                }
+            }
+            setTimeout(tick, deleting ? 60 : 100);
+        }
+        tick();
+
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

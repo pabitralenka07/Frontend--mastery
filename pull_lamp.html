@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pull Cord Lamp</title>
+<style>
+  body { margin: 0; background: #0A0C11; }
+
+  .lamp-room { position: relative; isolation: isolate; overflow: hidden; box-sizing: border-box; min-height: max(100vh, 640px);
+    display: flex; flex-direction: column; align-items: center; padding: 340px 20px 80px; background: #0A0C11; color: #F4ECDF; }
+  .lamp-content { position: relative; z-index: 1; max-width: 720px; text-align: center; }
+  .lamp-content h1 { margin: 0; font: 800 clamp(30px, 6vw, 60px)/1.05 system-ui, sans-serif; letter-spacing: -.025em; }
+  .lamp-content p { margin: 14px 0 26px; font: 500 17px/1.5 system-ui, sans-serif; color: #B9AE9E; }
+  .lamp-cta { display: inline-block; padding: 12px 22px; border-radius: 999px; background: #F4ECDF; color: #17120C;
+    font: 650 15px system-ui, sans-serif; text-decoration: none; transition: transform .16s ease-out; }
+  .lamp-cta:active { transform: scale(.97); }
+  .lamp-cta:focus-visible { outline: 2px solid #FFB35C; outline-offset: 3px; }
+  @media (hover: hover) and (pointer: fine) {
+    .lamp-cta:hover { background: #FFF6EA; }
+  }
+
+  /* the lamp, the dark and the light are drawn here, clicks pass through */
+  .lamp-canvas { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
+  /* invisible handle that follows the bead, 44px so it is easy to grab on a phone */
+  .lamp-bead { position: absolute; left: 0; top: 0; z-index: 3; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0;
+    border: 0; border-radius: 50%; background: transparent; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .lamp-bead:active { cursor: grabbing; }
+  .lamp-bead:focus-visible { outline: 2px solid #FFB35C; outline-offset: -8px; }
+</style>
+</head>
+<body>
+
+<section class="lamp-room" aria-label="Hero with a pull cord lamp">
+  <div class="lamp-content">
+    <h1>Websites people remember</h1>
+    <p>Pull the cord to turn on the light.</p>
+    <a class="lamp-cta" href="#contact">Let's talk</a>
+  </div>
+  <canvas class="lamp-canvas" aria-hidden="true"></canvas>
+  <button class="lamp-bead" type="button" aria-label="Turn the light on" aria-pressed="false"></button>
+</section>
+
+<script>
+  const GRAVITY = 0.4, PULL = 28;
+  const WIRE = 120, DARK = 0.93;
+  const SPRING = 0.12, TUG = 0.1, S = 1.35;      // switch spring inside the socket, how hard the cord tugs the lamp, lamp size
+
+  const room = document.querySelector('.lamp-room');
+  const cv = room.querySelector('.lamp-canvas'), g = cv.getContext('2d');
+  const beadBtn = room.querySelector('.lamp-bead'), title = room.querySelector('.lamp-content h1');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const eout = k => 1 - Math.pow(1 - clamp(k), 3);
+  const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  // rope: ceiling, two wire points, the lamp, then the pull cord hanging from the socket
+  const rope = [];
+  const point = (x, y, inv) => (rope.push({ x, y, ox: x, oy: y, inv }), rope.length - 1);
+  point(0, 0, 0); point(0, WIRE / 3, .3); point(0, WIRE * 2 / 3, .3);
+  const LAMP = point(0, WIRE, .02);
+  const OFF = { x: 17 * S, y: 20 * S };
+  const ROOT = point(OFF.x, WIRE + OFF.y, 1), CORD = [ROOT];
+  for (let i = 1; i <= 9; i++) CORD.push(point(OFF.x, WIRE + OFF.y + i * 13, i === 9 ? .7 : 1));
+  const BEAD = CORD[CORD.length - 1], bead = rope[BEAD];
+  const LINKS = [[0, 1, WIRE / 3], [1, 2, WIRE / 3], [2, LAMP, WIRE / 3]];
+  for (let i = 1; i < CORD.length; i++) LINKS.push([CORD[i - 1], CORD[i], 13]);
+
+  const angle = r => Math.atan2(-(r[LAMP].x - r[0].x), r[LAMP].y - r[0].y);
+  const local = (lx, ly, th, o) => ({ x: o.x + lx * Math.cos(th) - ly * Math.sin(th), y: o.y + lx * Math.sin(th) + ly * Math.cos(th) });
+
+  function keepLength(r) {
+    for (const [a, b, len] of LINKS) {
+      const A = r[a], B = r[b], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1;
+      const w = A.inv + B.inv; if (!w) continue;
+      const k = (d - len) / d / w;
+      A.x += dx * k * A.inv; A.y += dy * k * A.inv; B.x -= dx * k * B.inv; B.y -= dy * k * B.inv;
+    }
+    const at = local(OFF.x, OFF.y, angle(r), r[LAMP]), R = r[ROOT], L = r[LAMP];
+    const dx = R.x - at.x, dy = R.y - at.y;
+    R.x -= dx * SPRING; R.y -= dy * SPRING;              // the switch spring pulls the cord back into the socket
+    L.x += dx * SPRING * TUG; L.y += dy * SPRING * TUG;  // and tugs the lamp with it
+  }
+
+  // the switch
+  const lamp = {
+    on: false, since: -1e9,
+    toggle() {
+      this.on = !this.on; this.since = performance.now();
+      room.classList.toggle('is-on', this.on);
+      beadBtn.setAttribute('aria-pressed', this.on);
+      beadBtn.setAttribute('aria-label', this.on ? 'Turn the light off' : 'Turn the light on');
+      room.dispatchEvent(new CustomEvent('lamp', { detail: { on: this.on } }));
+    },
+  };
+  // filament heat: a dull red first, a small flicker, then full warm light. Off leaves an orange afterglow
+  function heat() {
+    const a = (performance.now() - lamp.since) / 1000;
+    if (reduce) return lamp.on ? 1 : 0;
+    if (lamp.on) return a < .06 ? .42 * a / .06 : a < .12 ? lerp(.42, .16, (a - .06) / .06) : lerp(.16, 1, eout((a - .12) / .5));
+    return Math.exp(-a / .22);
+  }
+  const STOPS = [[0, [46, 38, 34]], [.25, [110, 30, 8]], [.5, [224, 82, 14]], [.75, [255, 177, 74]], [1, [255, 243, 210]]];
+  function heatColor(h) {
+    for (let i = 1; i < STOPS.length; i++) if (h <= STOPS[i][0]) {
+      const [a, ca] = STOPS[i - 1], [b, cb] = STOPS[i], k = (h - a) / (b - a);
+      return ca.map((c, j) => Math.round(lerp(c, cb[j], k)));
+    }
+    return [255, 243, 210];
+  }
+
+  // size and position
+  let W = 0, H = 0, dpr = 1, rest = 0, titleBox = null, touched = false, REACH = 380;
+  function layout() {
+    const r = room.getBoundingClientRect(), nx = r.width / 2;
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    const shift = nx - rope[0].x;
+    for (const p of rope) { p.x += shift; p.ox += shift; }
+    const t = title.getBoundingClientRect();
+    titleBox = { x: t.left - r.left + t.width / 2, y: t.top - r.top + t.height / 2 };
+    const c = room.querySelector('.lamp-content').getBoundingClientRect();         // light reaches the bottom of your content
+    REACH = Math.max(380, (c.bottom - r.top - (WIRE + 70 * S)) * 1.25);
+  }
+  new ResizeObserver(layout).observe(room);
+  layout();
+  for (let i = 0; i < 1200; i++) simulate();
+  rest = bead.y;
+
+  // grabbing the bead
+  let hold = null, tug = null, was = false;
+  function toRoom(e) {
+    const r = room.getBoundingClientRect(), root = rope[ROOT];
+    let x = e.clientX - r.left, y = e.clientY - r.top;
+    const dx = x - root.x, dy = y - root.y, d = Math.hypot(dx, dy), max = 190;
+    if (d > max) { x = root.x + dx / d * max; y = root.y + dy / d * max; }
+    return { x, y };
+  }
+  beadBtn.addEventListener('pointerdown', e => { beadBtn.setPointerCapture(e.pointerId); hold = toRoom(e); touched = true; });
+  beadBtn.addEventListener('pointermove', e => { if (hold) hold = toRoom(e); });
+  const drop = () => { hold = null; };
+  beadBtn.addEventListener('pointerup', drop);
+  beadBtn.addEventListener('pointercancel', drop);
+  beadBtn.addEventListener('click', e => { if (e.detail === 0) { tug = { t: 0, x: bead.x, y: bead.y }; touched = true; } });   // Enter or Space
+
+  function simulate(target) {
+    if (target) bead.inv = 0;
+    for (const p of rope) {
+      if (!p.inv) continue;
+      const vx = (p.x - p.ox) * 0.99;
+      const vy = (p.y - p.oy) * 0.99;
+      p.ox = p.x; p.oy = p.y;
+      p.x += vx; p.y += vy + GRAVITY;
+    }
+    for (let i = 0; i < 20; i++) keepLength(rope);
+    if (target) { bead.ox = bead.x; bead.oy = bead.y; bead.x = target.x; bead.y = target.y; bead.inv = .7; }
+  }
+
+  function step() {
+    let target = hold;
+    if (!target && tug) {
+      tug.t += 1 / 60;
+      target = { x: tug.x + 6 * Math.sin(Math.PI * clamp(tug.t / .5)), y: tug.y + 46 * Math.sin(Math.PI * clamp(tug.t / .5)) };
+      if (tug.t >= .5) tug = null;
+    }
+    simulate(target);
+    const down = bead.y - rest > PULL;
+    if (down && !was) lamp.toggle(); was = down;
+  }
+
+  function draw(th, h) {
+    const L = Math.pow(clamp((h - .3) / .7), 1.3) * (reduce ? 1 : 1 - .04 * Math.max(0, Math.sin(performance.now() / 43) * Math.sin(performance.now() / 141)));
+    const lp = rope[LAMP], bulb = local(0, 70 * S, th, lp), now = performance.now() / 1000;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, H);
+
+    // the dark, with a warm hole and a cone below the bulb
+    g.fillStyle = `rgba(10,12,17,${DARK * (1 - .3 * L)})`; g.fillRect(0, 0, W, H);
+    if (L > 0) {
+      g.globalCompositeOperation = 'destination-out';
+      const hole = g.createRadialGradient(bulb.x, bulb.y, 0, bulb.x, bulb.y, REACH);
+      hole.addColorStop(0, `rgba(0,0,0,${L})`); hole.addColorStop(.55, `rgba(0,0,0,${.95 * L})`); hole.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = hole; g.fillRect(0, 0, W, H);
+      g.save(); g.translate(bulb.x, bulb.y); g.rotate(th); g.scale(1, 1.7);
+      const cone = g.createRadialGradient(0, REACH * .29, 0, 0, REACH * .29, REACH * .55);
+      cone.addColorStop(0, `rgba(0,0,0,${.5 * L})`); cone.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = cone; g.fillRect(-REACH, -REACH, REACH * 2, REACH * 2); g.restore();
+
+      g.globalCompositeOperation = 'lighter';
+      const warm = g.createRadialGradient(bulb.x, bulb.y + 40, 10, bulb.x, bulb.y + 60, REACH * 1.2);
+      warm.addColorStop(0, `rgba(96,64,36,${.7 * L})`); warm.addColorStop(.4, `rgba(40,28,18,${.45 * L})`); warm.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = warm; g.fillRect(0, 0, W, H);
+      g.save(); g.translate(bulb.x, bulb.y); g.rotate(th); g.scale(1, 2.1);
+      const beam = g.createRadialGradient(0, 70, 0, 0, 70, 180);
+      beam.addColorStop(0, `rgba(255,196,130,${.1 * L})`); beam.addColorStop(1, 'rgba(255,196,130,0)');
+      g.fillStyle = beam; g.fillRect(-180, -100, 360, 360); g.restore();
+      if (!reduce) for (let i = 0; i < 46; i++) {                 // dust in the light
+        const u = (hash(i) - .5) * 2, v = hash(i + 31);
+        const p = local(u * (26 + 170 * v) + Math.sin(now * .45 + i * 2.3) * 9, 36 + 270 * v + Math.sin(now * .31 + i * 1.7) * 11, th, bulb);
+        const a = L * (.25 + .75 * hash(i + 7)) * (1 - Math.abs(u) * .8) * (1 - v * .6) * (.55 + .45 * Math.sin(now * 1.4 + i));
+        if (a <= .02) continue;
+        const s = .7 + 1.3 * hash(i + 13), dg = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, s * 3);
+        dg.addColorStop(0, `rgba(255,236,205,${.8 * a})`); dg.addColorStop(1, 'rgba(255,220,170,0)');
+        g.fillStyle = dg; g.fillRect(p.x - s * 3, p.y - s * 3, s * 6, s * 6);
+      }
+      g.globalCompositeOperation = 'source-over';
+    }
+
+    // ceiling cup and fabric wire
+    const c0 = rope[0];
+    const cup = g.createLinearGradient(c0.x - 24, 0, c0.x + 24, 0); cup.addColorStop(0, '#1A1612'); cup.addColorStop(.5, '#5B4A34'); cup.addColorStop(1, '#1A1612');
+    g.beginPath(); g.roundRect(c0.x - 22, -6, 44, 12, 6); g.fillStyle = cup; g.fill();
+    g.strokeStyle = '#16130F'; g.lineWidth = 3.2; g.lineCap = g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(c0.x, c0.y); for (let i = 1; i <= LAMP; i++) g.lineTo(rope[i].x, rope[i].y); g.stroke();
+    if (L > 0) { g.strokeStyle = `rgba(255,205,150,${.25 * L})`; g.lineWidth = 1; g.stroke(); }
+
+    // pull cord and bead
+    const lit = Math.max(L, .35);
+    g.strokeStyle = `rgba(${lerp(120, 236, lit) | 0},${lerp(112, 222, lit) | 0},${lerp(100, 200, lit) | 0},.9)`; g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(rope[ROOT].x, rope[ROOT].y);
+    for (let i = 1; i < CORD.length; i++) { const a = rope[CORD[i - 1]], b = rope[CORD[i]]; g.quadraticCurveTo(a.x, a.y, (a.x + b.x) / 2, (a.y + b.y) / 2); }
+    g.lineTo(bead.x, bead.y); g.stroke();
+    const bg = g.createRadialGradient(bead.x - 2, bead.y - 2, 0, bead.x, bead.y, 6.5);
+    bg.addColorStop(0, '#FFF1D0'); bg.addColorStop(.35, '#C99A55'); bg.addColorStop(1, '#4A3218');
+    g.fillStyle = bg; g.beginPath(); g.arc(bead.x, bead.y, 6, 0, 7); g.fill();
+    if (!touched) {
+      g.fillStyle = `rgba(230,220,200,${.45 + .2 * Math.sin(now * 3)})`; g.font = '600 12px system-ui, sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+      g.fillText('Pull', bead.x + 14, bead.y + 1);
+    }
+
+    // brass socket, glass bulb, filament
+    g.save(); g.translate(lp.x, lp.y); g.rotate(th); g.scale(S, S);
+    const sg = g.createLinearGradient(-13, 0, 13, 0);
+    sg.addColorStop(0, '#2E2214'); sg.addColorStop(.3, '#9C7A49'); sg.addColorStop(.45, '#E6C790'); sg.addColorStop(.7, '#7C5E36'); sg.addColorStop(1, '#241A0F');
+    g.beginPath(); g.roundRect(-13, 0, 26, 27, 3); g.fillStyle = sg; g.fill();
+    g.fillStyle = 'rgba(0,0,0,.35)'; for (const y of [7, 12, 17]) g.fillRect(-13, y, 26, 1);
+    if (L > 0) { const wg = g.createLinearGradient(0, 10, 0, 27); wg.addColorStop(0, 'rgba(255,190,120,0)'); wg.addColorStop(1, `rgba(255,190,120,${.45 * L})`); g.beginPath(); g.roundRect(-13, 0, 26, 27, 3); g.fillStyle = wg; g.fill(); }
+    g.beginPath(); g.roundRect(-10, 27, 20, 8, 2); g.fillStyle = '#6E5A3E'; g.fill();
+    // pull switch sticking out of the socket, the cord comes out of its eye
+    const nub = g.createLinearGradient(0, 14, 0, 26);
+    nub.addColorStop(0, '#C9A362'); nub.addColorStop(.5, '#8A6B3C'); nub.addColorStop(1, '#3A2A16');
+    g.beginPath(); g.roundRect(9, 14, 9, 12, 3); g.fillStyle = nub; g.fill();
+    g.beginPath(); g.arc(17, 20, 2.6, 0, 7); g.strokeStyle = '#2A1F10'; g.lineWidth = 1.4; g.stroke();
+    const glass = () => { g.beginPath(); g.moveTo(-9, 35); g.bezierCurveTo(-9, 45, -31, 50, -31, 72); g.arc(0, 72, 31, Math.PI, 0, true); g.bezierCurveTo(31, 50, 9, 45, 9, 35); g.closePath(); };
+    glass(); g.fillStyle = 'rgba(190,205,230,.07)'; g.fill();
+    if (L > 0) {
+      const gl = g.createRadialGradient(0, 68, 2, 0, 70, 36);
+      gl.addColorStop(0, `rgba(255,250,232,${L})`); gl.addColorStop(.45, `rgba(255,208,140,${.75 * L})`); gl.addColorStop(1, `rgba(255,150,70,${.35 * L})`);
+      glass(); g.fillStyle = gl; g.fill();
+    }
+    g.strokeStyle = 'rgba(160,160,165,.55)'; g.lineWidth = .8;
+    g.beginPath(); g.moveTo(-3, 35); g.lineTo(-8, 66); g.moveTo(3, 35); g.lineTo(8, 66); g.stroke();
+    const [r, gg, b] = heatColor(h);
+    g.save();
+    if (h > .15) { g.shadowColor = `rgb(${r},${gg},${b})`; g.shadowBlur = 14 * h * dpr; }
+    g.strokeStyle = `rgb(${r},${gg},${b})`; g.lineWidth = 1.5 + .4 * h;
+    g.beginPath(); for (let i = 0; i <= 40; i++) { const u = i / 40, x = lerp(-8, 8, u), y = 66 - Math.sin(u * Math.PI * 8) * 2.6 - Math.sin(u * Math.PI) * 3; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+    g.restore();
+    glass(); g.strokeStyle = `rgba(255,255,255,${.2 + .15 * L})`; g.lineWidth = 1; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.42)'; g.lineWidth = 3; g.lineCap = 'round';
+    g.beginPath(); g.arc(0, 72, 23, Math.PI * 1.05, Math.PI * 1.38); g.stroke();
+    g.restore();
+
+    if (h > 0) {                                                  // bloom and a faint anamorphic streak
+      g.save(); g.globalCompositeOperation = 'lighter';
+      const bl = g.createRadialGradient(bulb.x, bulb.y, 0, bulb.x, bulb.y, 170);
+      bl.addColorStop(0, `rgba(255,226,180,${.55 * L + .12 * h})`); bl.addColorStop(.2, `rgba(255,170,90,${.22 * L + .05 * h})`); bl.addColorStop(1, 'rgba(255,150,70,0)');
+      g.fillStyle = bl; g.fillRect(bulb.x - 170, bulb.y - 170, 340, 340);
+      g.translate(bulb.x, bulb.y); g.scale(1, .045);
+      const st = g.createRadialGradient(0, 0, 0, 0, 0, 230);
+      st.addColorStop(0, `rgba(255,214,160,${.5 * L})`); st.addColorStop(1, 'rgba(255,170,90,0)');
+      g.fillStyle = st; g.fillRect(-230, -230, 460, 460);
+      g.restore();
+    }
+
+    // the heading throws a soft shadow away from the bulb
+    title.style.textShadow = L > .01
+      ? `${((titleBox.x - bulb.x) * .07).toFixed(1)}px ${((titleBox.y - bulb.y) * .05).toFixed(1)}px 8px rgba(0,0,0,${(.7 * L).toFixed(2)})`
+      : '';
+    beadBtn.style.translate = `${bead.x}px ${bead.y}px`;
+  }
+
+  // 60 physics steps a second on any screen, one drawing per frame
+  let last = performance.now(), acc = 0;
+  (function frame(now = performance.now()) {
+    acc += Math.min(100, now - last); last = now;
+    for (; acc >= 1000 / 60; acc -= 1000 / 60) step();
+    draw(angle(rope), heat());
+    requestAnimationFrame(frame);
+  })();
+</script>
+</body>
+</html>

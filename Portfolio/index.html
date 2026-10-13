@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Developer</title>
+    <meta name="description" content="Portfolio of John Doe, a creative developer specializing in modern web experiences.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head> 
+<body>
+    <div class="cursor-glow" id="cursor-glow"></div>
+    
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <a href="#" class="logo">JD<span>.</span></a>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Work</a></li>
+                <li><a href="#contact" class="btn-outline">Contact</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <span class="greeting animate-fade-in" style="animation-delay: 0.1s">Hello, I'm</span>
+                <h1 class="animate-fade-in" style="animation-delay: 0.2s">John Doe</h1>
+                <h2 class="animate-fade-in" style="animation-delay: 0.3s">A <span class="gradient-text">Creative Developer</span> building modern web experiences.</h2>
+                <p class="hero-desc animate-fade-in" style="animation-delay: 0.4s">I specialize in crafting beautiful, interactive, and high-performance applications that leave a lasting impression.</p>
+                <div class="hero-cta animate-fade-in" style="animation-delay: 0.5s">
+                    <a href="#projects" class="btn-primary">View My Work <i class="fa-solid fa-arrow-right"></i></a>
+                    <div class="social-links">
+                        <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual animate-fade-in" style="animation-delay: 0.6s">
+                <div class="blob shape-1"></div>
+                <div class="blob shape-2"></div>
+                <div class="glass-card main-card">
+                    <div class="code-snippet">
+                        <div class="dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <pre><code><span class="keyword">const</span> <span class="variable">developer</span> = {
+  <span class="property">name</span>: <span class="string">'John Doe'</span>,
+  <span class="property">skills</span>: [<span class="string">'HTML'</span>, <span class="string">'CSS'</span>, <span class="string">'JS'</span>],
+  <span class="property">passion</span>: <span class="string">'UI/UX Design'</span>,
+  <span class="function">build</span>: () => {
+    <span class="keyword">return</span> <span class="string">'Awesome Web Apps'</span>;
+  }
+};</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="projects" id="projects">
+            <div class="section-heading hidden">
+                <h2>Featured Projects</h2>
+                <div class="line"></div>
+            </div>
+            <div class="project-grid">
+                <div class="project-card glass-card hidden" style="transition-delay: 0.1s">
+                    <div class="project-img placeholder-1"></div>
+                    <div class="project-info">
+                        <h3>E-Commerce Platform</h3>
+                        <p>A modern, full-stack e-commerce solution with sleek animations and a seamless checkout experience.</p>
+                        <div class="tags">
+                            <span>React</span><span>Node.js</span><span>Stripe</span>
+                        </div>
+                        <a href="#" class="project-link" aria-label="View Project"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                </div>
+                <div class="project-card glass-card hidden" style="transition-delay: 0.2s">
+                    <div class="project-img placeholder-2"></div>
+                    <div class="project-info">
+                        <h3>Finance Dashboard</h3>
+                        <p>Real-time financial data visualization dashboard with interactive charts and dark mode support.</p>
+                        <div class="tags">
+                            <span>Vue</span><span>D3.js</span><span>Firebase</span>
+                        </div>
+                        <a href="#" class="project-link" aria-label="View Project"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                </div>
+                <div class="project-card glass-card hidden" style="transition-delay: 0.3s">
+                    <div class="project-img placeholder-3"></div>
+                    <div class="project-info">
+                        <h3>AI SaaS Application</h3>
+                        <p>An artificial intelligence wrapper application providing generative content tools with a premium aesthetic.</p>
+                        <div class="tags">
+                            <span>Next.js</span><span>OpenAI</span><span>Tailwind</span>
+                        </div>
+                        <a href="#" class="project-link" aria-label="View Project"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="contact" id="contact">
+            <div class="glass-card contact-card hidden">
+                <h2 class="gradient-text">Let's work together</h2>
+                <p>I'm currently available for freelance work and open to new opportunities.</p>
+                <a href="mailto:hello@example.com" class="btn-primary">Say Hello <i class="fa-regular fa-envelope"></i></a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 John Doe. Designed & Built with passion.</p>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
