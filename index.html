@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Mastery | All-in-One Showcase Hub</title>
+  <meta name="description" content="Explore 21 creative frontend experiments, full web applications, tactile micro-interactions, and WebGL 3D physics built by Pabitra Lenka.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bg: #07090F;
+      --card-bg: rgba(18, 22, 33, 0.72);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(99, 102, 241, 0.45);
+      --primary: #6366F1;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #06B6D4;
+      --accent-glow: rgba(6, 182, 212, 0.25);
+      --pink: #EC4899;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --text: #F3F4F6;
+      --text-muted: #94A3B8;
+      --radius: 18px;
+      --radius-sm: 10px;
+      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-heading: 'Outfit', system-ui, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background FX */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.22;
+      animation: float 20s ease-in-out infinite alternate;
+    }
+    .orb-1 {
+      top: -10%;
+      left: 15%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, #6366F1, transparent 70%);
+    }
+    .orb-2 {
+      top: 45%;
+      right: -5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #EC4899, transparent 70%);
+      animation-delay: -7s;
+    }
+    .orb-3 {
+      bottom: -15%;
+      left: 30%;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, #06B6D4, transparent 70%);
+      animation-delay: -14s;
+    }
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse at 50% 50%, black 40%, transparent 80%);
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg) scale(1); }
+      50% { transform: translateY(50px) rotate(180deg) scale(1.08); }
+      100% { transform: translateY(-30px) rotate(360deg) scale(0.95); }
+    }
+
+    /* Layout Wrapper */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: min(1320px, 94vw);
+      margin: 0 auto;
+      padding: 0 0 80px;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366F1, #EC4899);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 8px 24px var(--primary-glow);
+    }
+    .logo-text {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+    .logo-text span {
+      background: linear-gradient(90deg, #818CF8, #F472B6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .nav-btn.primary {
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      border-color: #6366F1;
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+    .nav-btn.primary:hover {
+      box-shadow: 0 6px 26px rgba(99, 102, 241, 0.45);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 70px 10px 50px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(99, 102, 241, 0.12);
+      color: #A5B4FC;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      margin-bottom: 22px;
+      animation: pulse-glow 3s infinite alternate;
+    }
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 10px rgba(99, 102, 241, 0.1); }
+      100% { box-shadow: 0 0 24px rgba(99, 102, 241, 0.4); }
+    }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      margin-bottom: 20px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #FFFFFF 20%, #A5B4FC 60%, #F472B6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: clamp(16px, 2.2vw, 20px);
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 34px;
+      font-weight: 400;
+    }
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 10px;
+    }
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      font-size: 14px;
+    }
+    .stat-chip b {
+      color: #fff;
+      font-family: var(--font-heading);
+      font-size: 17px;
+    }
+
+    /* Controls Bar: Search & Filter */
+    .controls-bar {
+      margin: 40px 0 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .search-wrapper {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 16px 20px 16px 52px;
+      border-radius: 999px;
+      background: rgba(18, 22, 33, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      outline: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s ease;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow), 0 12px 35px rgba(0, 0, 0, 0.5);
+    }
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tab-btn {
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text);
+    }
+    .tab-btn.active {
+      background: var(--text);
+      color: #000;
+      border-color: var(--text);
+      box-shadow: 0 4px 18px rgba(255, 255, 255, 0.25);
+    }
+
+    /* Projects Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+      gap: 26px;
+      margin-top: 20px;
+    }
+
+    /* Project Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(16px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--card-accent, #6366F1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--card-hover-border);
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 30px var(--primary-glow);
+    }
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      color: var(--card-accent, #818CF8);
+      transition: transform 0.3s ease;
+    }
+    .card:hover .icon-box {
+      transform: scale(1.08) rotate(4deg);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .category-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--card-accent, #A5B4FC);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card-body h3 {
+      font-family: var(--font-heading);
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .card-body p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .tag {
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #CBD5E1;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 0;
+    }
+    .btn-preview {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+    }
+    .btn-preview:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-launch {
+      background: linear-gradient(135deg, var(--card-accent, #6366F1), #4338CA);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+    .btn-launch:hover {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+    }
+
+    /* Modal Live Preview */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 13, 0.85);
+      backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open {
+      display: grid;
+      opacity: 1;
+    }
+    .modal-window {
+      background: #0E121B;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      width: min(1200px, 96vw);
+      height: min(880px, 92vh);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modal-enter {
+      from { transform: scale(0.95) translateY(20px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .modal-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      background: #141926;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 16px;
+    }
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .modal-url-pill {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .device-switcher {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 3px;
+      border-radius: 8px;
+    }
+    .device-btn {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .device-btn.active, .device-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .modal-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-ctrl-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .modal-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+    }
+    .modal-close:hover {
+      background: #EF4444;
+      border-color: #EF4444;
+    }
+    .modal-iframe-container {
+      flex: 1;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #07090F;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .preview-iframe.tablet {
+      width: 768px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .preview-iframe.mobile {
+      width: 390px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .footer-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.2s;
+    }
+    .footer-link:hover {
+      color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card-actions {
+        grid-template-columns: 1fr;
+      }
+      .device-switcher {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Orbs -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="container">
+    
+    <!-- Top Navigation -->
+    <header class="navbar">
+      <a href="#" class="logo-group">
+        <div class="logo-badge">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div class="logo-text">
+          Frontend<span>Mastery</span>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <a href="https://github.com/pabitralenka07/Frontend--mastery" target="_blank" class="nav-btn">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+        <a href="#projects" class="nav-btn primary">
+          <i class="fa-solid fa-compass"></i>
+          <span>Explore (21)</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-pill">
+        <i class="fa-solid fa-sparkles"></i> All-in-One Deployment Hub
+      </div>
+      <h1>
+        Crafted with Code.<br>
+        <span class="gradient-text">Engineered to Inspire.</span>
+      </h1>
+      <p>
+        A unified showcase of 21 interactive web applications, real-time physics engines, 3D WebGL experiences, and next-generation UI micro-interactions created by <b>Pabitra Lenka</b>.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-chip">
+          <i class="fa-solid fa-layer-group" style="color: #818CF8;"></i>
+          <span><b>21</b> Projects Live</span>
+        </div>
+        <div class="stat-chip">
+          <i class="fa-solid fa-bolt" style="color: #F472B6;"></i>
+          <span><b>Zero</b> Build Step</span>
+        </div>
+        <div class="stat-chip">
+          <i class="fa-brands fa-js" style="color: #FCD34D;"></i>
+          <span><b>100%</b> Vanilla & WebGL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search & Filter Controls -->
+    <section class="controls-bar" id="projects">
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, technology, or feature (e.g., 'canvas', 'login', '3D')...">
+      </div>
+
+      <div class="filter-tabs">
+        <button class="tab-btn active" data-filter="all"><i class="fa-solid fa-grid-2"></i> All Projects (21)</button>
+        <button class="tab-btn" data-filter="apps"><i class="fa-solid fa-bag-shopping"></i> Full Apps</button>
+        <button class="tab-btn" data-filter="micro"><i class="fa-solid fa-wand-magic-sparkles"></i> Micro-Interactions</button>
+        <button class="tab-btn" data-filter="3d"><i class="fa-solid fa-cube"></i> 3D & WebGL</button>
+        <button class="tab-btn" data-filter="canvas"><i class="fa-solid fa-atom"></i> Canvas & Physics</button>
+        <button class="tab-btn" data-filter="portfolios"><i class="fa-solid fa-id-badge"></i> Portfolios</button>
+      </div>
+    </section>
+
+    <!-- Cards Grid -->
+    <main class="grid" id="projectsGrid">
+      <!-- Injected via JavaScript -->
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="https://github.com/pabitralenka07" target="_blank" class="footer-link"><i class="fa-brands fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/pabitra-lenka-777423324/" target="_blank" class="footer-link"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="https://x.com/PabitraLenka777" target="_blank" class="footer-link"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://www.instagram.com/_duh._.its_babu_?igsh=MXZyODBoenlvOHZ1dQ==" target="_blank" class="footer-link"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+      <p>© 2026 Pabitra Lenka. Crafted with passion for modern web engineering.</p>
+    </footer>
+
+  </div>
+
+  <!-- Interactive Live Preview Modal -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-window">
+      <div class="modal-topbar">
+        <div class="modal-title-group">
+          <div class="modal-title" id="modalProjectTitle">Project Preview</div>
+          <div class="modal-url-pill" id="modalProjectUrl">/project</div>
+        </div>
+
+        <div class="device-switcher">
+          <button class="device-btn active" data-device="desktop" title="Desktop View"><i class="fa-solid fa-desktop"></i></button>
+          <button class="device-btn" data-device="tablet" title="Tablet View"><i class="fa-solid fa-tablet-screen-button"></i></button>
+          <button class="device-btn" data-device="mobile" title="Mobile View"><i class="fa-solid fa-mobile-screen"></i></button>
+        </div>
+
+        <div class="modal-controls">
+          <button class="modal-ctrl-btn" id="reloadFrameBtn" title="Reload Frame"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+          <a href="#" target="_blank" class="modal-ctrl-btn" id="openExternalBtn" title="Open Fullscreen in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          <button class="modal-ctrl-btn modal-close" id="closeModalBtn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div class="modal-iframe-container">
+        <iframe id="previewIframe" class="preview-iframe" src="" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const projects = [
+      {
+        id: "ecommerce",
+        title: "Pabitra E-Commerce Store",
+        category: "apps",
+        categoryName: "Full Application",
+        icon: "fa-solid fa-bag-shopping",
+        accent: "#10B981",
+        url: "Pabitra-ecommerce/index.html",
+        description: "Comprehensive 9-page responsive modern retail platform with shop filters, product details, cart, checkout, wishlist, and dashboard.",
+        tags: ["HTML5", "CSS Grid", "JavaScript", "Multi-Page", "E-Commerce"]
+      },
+      {
+        id: "holo-card",
+        title: "Holo Card 3D Tilt & Flip",
+        category: "3d",
+        categoryName: "3D Micro-Interaction",
+        icon: "fa-solid fa-credit-card",
+        accent: "#8B5CF6",
+        url: "holo_card.html",
+        description: "Tactile credit card checkout featuring real-time 3D tilt tracking, holographic rainbow sheen, and dual-sided 3D flip on CVV focus.",
+        tags: ["CSS 3D", "Preserve-3D", "Pointer Tracking", "Fintech UI"]
+      },
+      {
+        id: "spark-login",
+        title: "Firefly Spark Login",
+        category: "micro",
+        categoryName: "Creative UI / Canvas",
+        icon: "fa-solid fa-bolt",
+        accent: "#F59E0B",
+        url: "spark_login.html",
+        description: "Animated firefly carrying an ambient dark-mode spotlight that illuminates fields, dives into password input, and auto-demos.",
+        tags: ["Canvas 2D", "Ambient Light", "Particle Math", "Interactive Auth"]
+      },
+      {
+        id: "pull-lamp",
+        title: "Pull Cord Lamp Physics",
+        category: "canvas",
+        categoryName: "Real-Time Physics",
+        icon: "fa-solid fa-lightbulb",
+        accent: "#FBBF24",
+        url: "pull_lamp.html",
+        description: "60 FPS Verlet integration rope physics simulation with interactive pull bead, incandescent filament heat bloom, and dynamic shadow cast.",
+        tags: ["Verlet Rope", "Canvas Physics", "Bloom Shaders", "Kinematics"]
+      },
+      {
+        id: "neon-password",
+        title: "Neon Gas-Discharge Password",
+        category: "micro",
+        categoryName: "Tactile UI",
+        icon: "fa-solid fa-shield-halved",
+        accent: "#06B6D4",
+        url: "neon_password.html",
+        description: "Multi-segment gas-discharge neon tube measuring password entropy; sputters and shoots sparks upon weak submission.",
+        tags: ["Neon Shaders", "Entropy Engine", "Sparks Physics", "Forms"]
+      },
+      {
+        id: "otp-island",
+        title: "OTP Dynamic Island",
+        category: "micro",
+        categoryName: "Apple-Inspired UI",
+        icon: "fa-solid fa-mobile-screen-button",
+        accent: "#3B82F6",
+        url: "otp_island.html",
+        description: "iOS-style dynamic island morphing pill; OTP chips fly into cells along parabolic bezier trajectories with auto-merge verification.",
+        tags: ["Dynamic Island", "Bezier Flight", "Web Animations API", "iOS UI"]
+      },
+      {
+        id: "tentacles",
+        title: "Tentacle Sync Cursor",
+        category: "3d",
+        categoryName: "Cross-Window Canvas",
+        icon: "fa-solid fa-arrows-split-up-and-left",
+        accent: "#EF4444",
+        url: "-TENTACLE-SYNC-CURSOR-main/index.html",
+        description: "Inverse-kinematics red anime tentacle canvas following cursor; synchronizes across multiple browser tabs/windows in real time via BroadcastChannel.",
+        tags: ["BroadcastChannel", "Inverse Kinematics", "Multi-Tab", "Canvas"]
+      },
+      {
+        id: "heart-3d",
+        title: "Crystal Heart 3D",
+        category: "3d",
+        categoryName: "WebGL Experience",
+        icon: "fa-solid fa-heart",
+        accent: "#EC4899",
+        url: "Heart_song/index.html",
+        description: "Stunning 3D crystal heart mesh surrounded by thousands of orbiting light particles, custom shaders, and dynamic camera choreography.",
+        tags: ["Three.js", "GSAP", "GLTFLoader", "WebGL 3D"]
+      },
+      {
+        id: "thunder",
+        title: "Thunder to Text",
+        category: "canvas",
+        categoryName: "Generative Canvas FX",
+        icon: "fa-solid fa-cloud-bolt",
+        accent: "#6366F1",
+        url: "Thunder/thunder.html",
+        description: "Converts custom typed text into particle coordinates with procedural electrical discharge arcs and violent lightning strikes in real-time.",
+        tags: ["Generative Canvas", "Particle Math", "Lightning Arcs"]
+      },
+      {
+        id: "particles",
+        title: "Particle Network Constellation",
+        category: "canvas",
+        categoryName: "Interactive Canvas",
+        icon: "fa-solid fa-circle-nodes",
+        accent: "#8B5CF6",
+        url: "animation/abc1.html",
+        description: "Dynamic constellation particles connected by proximity distance lines with interactive magnetic mouse repulsion radius.",
+        tags: ["Canvas 2D", "Constellation", "Mouse Physics", "Vector Math"]
+      },
+      {
+        id: "portfolio-modern",
+        title: "Creative Developer Portfolio",
+        category: "portfolios",
+        categoryName: "Developer Showcase",
+        icon: "fa-solid fa-laptop-code",
+        accent: "#38BDF8",
+        url: "Portfolio/index.html",
+        description: "Modern dark developer portfolio with radial ambient cursor glow, sleek typography, project showcase cards, and smooth navigation.",
+        tags: ["Cursor Glow", "Glassmorphism", "Responsive", "Modern CSS"]
+      },
+      {
+        id: "mypage3",
+        title: "Pabitra Portfolio (AOS)",
+        category: "portfolios",
+        categoryName: "Personal Portfolio",
+        icon: "fa-solid fa-address-card",
+        accent: "#A855F7",
+        url: "myPage3/mypage3.html",
+        description: "Personal portfolio website featuring AOS scroll choreography, skills grid, responsive drawer menu, and social links.",
+        tags: ["AOS Library", "FontAwesome", "Drawer Nav", "Web Designer"]
+      },
+      {
+        id: "mypage2",
+        title: "Babu Portfolio",
+        category: "portfolios",
+        categoryName: "Personal Portfolio",
+        icon: "fa-solid fa-user-tie",
+        accent: "#06B6D4",
+        url: "Mypage2/mypage2.html",
+        description: "Personal portfolio layout with responsive mobile navigation overlay, service cards, and skills overview.",
+        tags: ["Mobile First", "Dropdown Overlay", "Personal Brand"]
+      },
+      {
+        id: "pl-brand",
+        title: "PL Web Designer Brand",
+        category: "portfolios",
+        categoryName: "Landing Page",
+        icon: "fa-solid fa-palette",
+        accent: "#F43F5E",
+        url: "PL/pl.html",
+        description: "Bold typography personal brand site showcasing frontend services, hire me CTA, and social integrations.",
+        tags: ["Neon Accents", "Ionicons", "Landing Page", "Designer"]
+      },
+      {
+        id: "todo",
+        title: "To-Do List Web App",
+        category: "apps",
+        categoryName: "Productivity App",
+        icon: "fa-solid fa-list-check",
+        accent: "#10B981",
+        url: "ToDo_List/index.html",
+        description: "Fast productivity task manager with task completion strike-throughs, deletion triggers, and localStorage persistence across reloads.",
+        tags: ["LocalStorage", "DOM Manipulation", "Productivity", "Vanilla JS"]
+      },
+      {
+        id: "polaroid-wall",
+        title: "Draggable Polaroid Wall",
+        category: "canvas",
+        categoryName: "Interactive Gallery",
+        icon: "fa-solid fa-images",
+        accent: "#FB923C",
+        url: "wpPic/wppic.html",
+        description: "Interactive polaroid gallery wall featuring realistic photo dragging, sticky captions, video embeds, and mobile touch support.",
+        tags: ["Touch Events", "Pointer Drag", "Polaroid UI", "Transforms"]
+      },
+      {
+        id: "clock",
+        title: "Cyberpunk Orbitron Clock",
+        category: "micro",
+        categoryName: "UI Utility",
+        icon: "fa-solid fa-clock",
+        accent: "#EC4899",
+        url: "clock.html",
+        description: "High-contrast digital clock UI displaying live system hours, minutes, seconds, and date inside a glassmorphic gradient card.",
+        tags: ["Orbitron Font", "Live Timers", "Glassmorphism", "CSS Gradients"]
+      },
+      {
+        id: "heartbeat",
+        title: "ECG Heartbeat Pulse",
+        category: "canvas",
+        categoryName: "SVG Animation",
+        icon: "fa-solid fa-heart-pulse",
+        accent: "#EF4444",
+        url: "Heartbeat/heartbeat.html",
+        description: "Scalable vector graphics electrocardiogram line waveform with stroke-dashoffset animation synchronized to a pulsing heart.",
+        tags: ["SVG Paths", "Stroke-Dashoffset", "Keyframe Sync", "Medical UI"]
+      },
+      {
+        id: "floatheart",
+        title: "Floating Hearts Cascade",
+        category: "canvas",
+        categoryName: "DOM Particle Stream",
+        icon: "fa-solid fa-heart-circle-bolt",
+        accent: "#F472B6",
+        url: "Floatheart/floatheart.html",
+        description: "Endless generator of pastel and ruby hearts with randomized horizontal drift, sizes, and automated DOM garbage collection.",
+        tags: ["CSS Keyframes", "DOM Garbage Collection", "Particle Stream"]
+      },
+      {
+        id: "login-slider",
+        title: "Coding Club Sliding Auth",
+        category: "micro",
+        categoryName: "Interactive Form",
+        icon: "fa-solid fa-id-card",
+        accent: "#6366F1",
+        url: "LoginForm/loginform.html",
+        description: "Dual Login and Registration card featuring a smooth sliding pill indicator (.slider-tab) built with zero external dependencies.",
+        tags: ["Radio Slider Tabs", "CSS Flexbox", "Auth Card", "Pure CSS"]
+      },
+      {
+        id: "webpage-classic",
+        title: "Classic Portfolio Landing",
+        category: "portfolios",
+        categoryName: "Showcase Page",
+        icon: "fa-solid fa-globe",
+        accent: "#38BDF8",
+        url: "Webpage/webpage.html",
+        description: "Clean introductory personal portfolio with shape framing, CV download trigger, and responsive navigation header.",
+        tags: ["Semantic HTML", "CSS Layouts", "CV Download", "Landing"]
+      }
+    ];
+
+    const grid = document.getElementById("projectsGrid");
+    const searchInput = document.getElementById("searchInput");
+    const filterTabs = document.querySelectorAll(".tab-btn");
+    
+    // Modal Elements
+    const modal = document.getElementById("previewModal");
+    const previewIframe = document.getElementById("previewIframe");
+    const modalTitle = document.getElementById("modalProjectTitle");
+    const modalUrl = document.getElementById("modalProjectUrl");
+    const openExternalBtn = document.getElementById("openExternalBtn");
+    const reloadFrameBtn = document.getElementById("reloadFrameBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const deviceButtons = document.querySelectorAll(".device-btn");
+
+    let currentFilter = "all";
+    let currentSearch = "";
+    let activePreviewUrl = "";
+
+    function renderProjects() {
+      grid.innerHTML = "";
+
+      const filtered = projects.filter(p => {
+        const matchesCategory = currentFilter === "all" || p.category === currentFilter;
+        const matchesQuery = p.title.toLowerCase().includes(currentSearch) ||
+                             p.description.toLowerCase().includes(currentSearch) ||
+                             p.tags.some(t => t.toLowerCase().includes(currentSearch));
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <i class="fa-solid fa-magnifying-glass" style="font-size: 32px; margin-bottom: 14px; opacity: 0.5;"></i>
+            <h3>No projects found matching "${currentSearch}"</h3>
+            <p>Try searching for a different keyword or select another category filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.style.setProperty("--card-accent", p.accent);
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="icon-box">
+              <i class="${p.icon}"></i>
+            </div>
+            <span class="category-badge">${p.categoryName}</span>
+          </div>
+
+          <div class="card-body">
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
+            <div class="tags">
+              ${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn-action btn-preview" onclick="openPreview('${p.url}', '${p.title}')">
+              <i class="fa-solid fa-eye"></i> Quick Preview
+            </button>
+            <a href="${p.url}" target="_blank" class="btn-action btn-launch">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open App
+            </a>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Filter Tabs
+    filterTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        filterTabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentFilter = tab.dataset.filter;
+        renderProjects();
+      });
+    });
+
+    // Search Input
+    searchInput.addEventListener("input", (e) => {
+      currentSearch = e.target.value.toLowerCase().trim();
+      renderProjects();
+    });
+
+    // Open Modal Preview
+    window.openPreview = function(url, title) {
+      activePreviewUrl = url;
+      previewIframe.src = url;
+      modalTitle.textContent = title;
+      modalUrl.textContent = "/" + url;
+      openExternalBtn.href = url;
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    };
+
+    // Close Modal Preview
+    function closeModal() {
+      modal.classList.remove("open");
+      previewIframe.src = "";
+      document.body.style.overflow = "";
+    }
+    closeModalBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+    });
+
+    // Reload Frame
+    reloadFrameBtn.addEventListener("click", () => {
+      if (previewIframe.src) {
+        previewIframe.src = previewIframe.src;
+      }
+    });
+
+    // Device Switcher
+    deviceButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        deviceButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const device = btn.dataset.device;
+        previewIframe.className = "preview-iframe " + (device === "desktop" ? "" : device);
+      });
+    });
+
+    // Initial render
+    renderProjects();
+  </script>
+</body>
+</html>

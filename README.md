@@ -148,8 +148,11 @@ mindmap
 
 ```
 Frontend--mastery/
+├── index.html                         # 🌟 Master Showcase Portal & Interactive Launchpad
+├── vercel.json                        # 🚀 Vercel routing config & clean URL rewrites
 ├── .gitignore                         # Git ignore rules for OS and IDE files
 ├── README.md                          # Repository documentation & guide
+├── LICENSE                            # MIT Open Source License
 │
 ├── 🛒 Full-Featured Applications
 │   ├── Pabitra-ecommerce/             # 9-page responsive e-commerce platform
@@ -232,7 +235,44 @@ Frontend--mastery/
 
 ---
 
-## 💻 Getting Started & How to Run
+## 🚀 Deploying to Vercel (All Projects in One Link)
+
+Yes! All 21 projects can be showcased and run from **one single Vercel link**:
+
+### How It Works:
+1. **Master Launchpad (`index.html`):**
+   - When visitors land on your root Vercel domain (`https://frontend-mastery.vercel.app/`), they are greeted by an interactive **Showcase Portal**.
+   - Visitors can search, filter by category (Full Apps, 3D, Micro-Interactions, Canvas, Portfolios), and launch an **In-Page Live Modal Preview** with mobile/tablet/desktop device toggles!
+2. **Dedicated Project Routes:**
+   - Every project is also accessible directly via clean routes defined in [`vercel.json`](vercel.json):
+     - `https://your-domain.vercel.app/ecommerce` → Pabitra E-Commerce Store
+     - `https://your-domain.vercel.app/holo-card` → 3D Holographic Card
+     - `https://your-domain.vercel.app/spark-login` → Firefly Spark Login
+     - `https://your-domain.vercel.app/lamp` → Pull Cord Lamp Physics
+     - `https://your-domain.vercel.app/neon-password` → Neon Password Strength
+     - `https://your-domain.vercel.app/otp` → OTP Dynamic Island
+     - `https://your-domain.vercel.app/portfolio` → Creative Developer Portfolio
+     - `https://your-domain.vercel.app/todo` → To-Do List Web App
+     - `https://your-domain.vercel.app/heart-3d` → Three.js Crystal Heart 3D
+     - `https://your-domain.vercel.app/thunder` → Thunder to Text Generator
+     - `https://your-domain.vercel.app/tentacles` → Tentacle Sync Canvas
+     - *(and all other components at their clean URLs)*
+
+### Deploying via Vercel (Option 1: One-Click Git Import - Recommended):
+1. Go to [vercel.com/new](https://vercel.com/new).
+2. Connect your GitHub account and click **Import** next to `Frontend--mastery`.
+3. Keep default settings (Framework Preset: **Other**, Root Directory: `./`).
+4. Click **Deploy**! In ~15 seconds, your master showcase will be live.
+
+### Deploying via Vercel CLI (Option 2):
+```bash
+npx vercel
+```
+Follow the terminal prompts to link and deploy your project.
+
+---
+
+## 💻 Getting Started & How to Run Locally
 
 ### 1. Clone the Repository
 ```bash
@@ -245,7 +285,7 @@ cd Frontend--mastery
 All projects are built with zero build step dependencies required—pure Vanilla HTML5, CSS3, and JavaScript!
 
 #### Option A: Direct in Browser
-Simply double-click any `.html` file (or right-click → **Open With** → Your preferred browser).
+Simply double-click `index.html` (or any sub-project HTML file) to open directly in your browser.
 
 #### Option B: VS Code Live Server (Recommended)
 1. Install the **Live Server** extension in VS Code.
